@@ -121,7 +121,7 @@ const DailyForecast: React.FC<DailyForecastProps> = ({ forecast, textColor }) =>
                   style={{ minWidth: `${dayWidth}px` }}
                 >
                   <p className="font-bold text-sm">{formattedDate}</p>
-                  <WeatherIcon size={40} className='pb-1'/>
+                  <WeatherIcon size={60} className='py-1'/>
                   <p className='font-bold text-lg pb-1'>{Math.round(day.maxTemp)}° / {Math.round(day.minTemp)}°</p>
                   <span className='flex items-center flex-row'>
                     <RainIcon className='mr-1' size={10}/>

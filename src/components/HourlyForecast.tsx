@@ -134,7 +134,7 @@ const HourlyForecast: React.FC<HourlyForecastProps> = ({
               return (
                 <div key={index} className={`flex flex-col items-center ${textColor}`} style={{ minWidth: `${hourWidth}px` }}>
                   <p className="font-bold text-sm pb-1">{formattedTime}</p>
-                  <WeatherIcon size={40} className='pb-1'/>
+                  <WeatherIcon size={60} className='pb-1'/>
                   <p className='text-lg font-bold'>{Math.round(hour.temperature)}°C</p>
                   <span className='flex items-center flex-row'>
                     <RainIcon className='mr-1' size={10}/>

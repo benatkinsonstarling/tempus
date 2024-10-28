@@ -65,11 +65,11 @@ export default function Page() {
       if (weatherData) {
         setWeatherData(weatherData);
         const gradient = getBackgroundColor(
-          weatherData.current.condition.text,
-          weatherData.current.temp_c,
-          localTime,
-          weatherData.forecast.forecastday[0].astro.sunset,
-          weatherData.forecast.forecastday[0].astro.sunrise
+          weatherData.current.weather[0].id,
+          weatherData.current.temp,
+          weatherData.current.dt,
+          weatherData.current.sunset,
+          weatherData.current.sunrise
         );
         setBackgroundGradient(gradient);
         setIsLight(isLightGradient(gradient));
