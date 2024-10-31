@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { LogOut, User, MapPin } from "lucide-react"
+import { LogOut, User, MapPin, Menu } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -28,82 +28,75 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs"
 import { SavedLocations } from "./SavedLocations"
 
 interface AppSidebarProps {
-  backgroundGradient?: string;
-  onLocationSelect?: (lat: number, lon: number) => void;
+  backgroundGradient: string;
+  onLocationSelect: (lat: number, lon: number, locationName: string) => void;
+  onLocationSaved: () => void;
 }
 
-function SidebarContents({ onLocationSelect }: { onLocationSelect?: (lat: number, lon: number) => void }) {
-  const { user, isSignedIn } = useUser()
-  const { state } = useSidebar()
-  const isExpanded = state === "expanded"
+export function AppSidebar({ backgroundGradient, onLocationSelect, onLocationSaved }: AppSidebarProps) {
+  const { isSignedIn, user } = useUser();
 
   return (
-    <>
-      <SidebarHeader>
-        <SidebarTrigger />
-      </SidebarHeader>
-      <SidebarContent>
-        {isSignedIn && (
-          <SidebarGroup>
-            <SidebarGroupLabel>
-              <MapPin className="mr-2" />
-              {isExpanded && "Saved Locations"}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SavedLocations onLocationSelect={onLocationSelect || (() => {})} />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-      </SidebarContent>
-      <SidebarFooter>
-        {isSignedIn ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={user?.imageUrl} alt={user?.fullName || ''} />
-                  <AvatarFallback>{user?.firstName?.[0]}</AvatarFallback>
-                </Avatar>
-                {isExpanded && (
-                  <span className="ml-2">{user?.fullName}</span>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <SignOutButton>
-                <DropdownMenuItem>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </SignOutButton>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <SignInButton mode="modal">
-            <Button variant="ghost" className="w-full justify-start">
-              <User className="h-4 w-4" />
-              {isExpanded && (
-                <span className="ml-2">Sign in</span>
-              )}
-            </Button>
-          </SignInButton>
-        )}
-      </SidebarFooter>
-    </>
-  )
-}
-
-export function AppSidebar({ backgroundGradient, onLocationSelect }: AppSidebarProps) {
-  return (
-    <SidebarProvider defaultOpen={false}>
-      <Sidebar 
-        collapsible="icon"
-        className={`${backgroundGradient ? backgroundGradient + ' ' : 'bg-black'} bg-opacity-10 transition-all duration-500`}
-      >
-        <SidebarContents onLocationSelect={onLocationSelect} />
+    <SidebarProvider>
+      <Sidebar defaultCollapsed={true}>
+        <SidebarTrigger className="fixed top-4 left-4 z-50">
+          <Menu className="h-4 w-4" />
+        </SidebarTrigger>
+        
+        <SidebarHeader className="border-none">
+          <div className="p-4">
+            {isSignedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="w-full flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={user?.imageUrl} />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{user?.firstName}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <SignOutButton>
+                      <div className="flex items-center gap-2">
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </div>
+                    </SignOutButton>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <SignInButton>
+                <Button variant="ghost" className="w-full">Sign In</Button>
+              </SignInButton>
+            )}
+          </div>
+        </SidebarHeader>
+        <SidebarContent className={`${backgroundGradient || 'bg-gradient-to-b from-blue-400 to-blue-600'} flex-1 transition-all duration-500`}>
+          {isSignedIn && (
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Saved Locations
+                </div>
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SavedLocations 
+                  onLocationSelect={onLocationSelect} 
+                  onLocationSaved={onLocationSaved}
+                />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+        </SidebarContent>
       </Sidebar>
     </SidebarProvider>
-  )
+  );
 }

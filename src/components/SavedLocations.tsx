@@ -1,16 +1,13 @@
-"use client"
-
 import { useSavedLocations } from "@/hooks/useSavedLocations";
-import { MapPinIcon } from "lucide-react";
-import { Button } from "./ui/button";
+import WeatherPanel from "./WeatherPanel";
 
 interface SavedLocationsProps {
-  onLocationSelect: (lat: number, lon: number) => void;
+  onLocationSelect: (lat: number, lon: number, locationName: string) => void;
 }
 
 export function SavedLocations({ onLocationSelect }: SavedLocationsProps) {
-  const { locations, isLoading, error } = useSavedLocations();
-
+  const { locations, isLoading, error, deleteLocation } = useSavedLocations();
+  
   if (isLoading) {
     return <div className="p-4">Loading saved locations...</div>;
   }
@@ -27,18 +24,28 @@ export function SavedLocations({ onLocationSelect }: SavedLocationsProps) {
     );
   }
 
+  // Separate favorites and non-favorites
+  const favoriteLocations = locations.filter(loc => loc.isFavorite);
+  const nonFavoriteLocations = locations
+    .filter(loc => !loc.isFavorite)
+    .slice(0, 3); // Take only the 3 most recent
+
+  // Combine favorites and recent non-favorites
+  const locationsToDisplay = [...favoriteLocations, ...nonFavoriteLocations];
+
   return (
     <div className="flex flex-col gap-2 p-4">
-      {locations.map((location) => (
-        <Button
-          key={location.id}
-          variant="ghost"
-          className="w-full justify-start"
-          onClick={() => onLocationSelect(location.latitude, location.longitude)}
-        >
-          <MapPinIcon className="mr-2 h-4 w-4" />
-          {location.name}
-        </Button>
+      {locationsToDisplay.map((location) => (
+        <WeatherPanel 
+          key={location.id} 
+          id={location.id}
+          location={location.name} 
+          latitude={location.latitude}
+          longitude={location.longitude}
+          onClick={() => onLocationSelect(location.latitude, location.longitude, location.name)}
+          isFavorite={location.isFavorite}
+          onDelete={deleteLocation}
+        />
       ))}
     </div>
   );

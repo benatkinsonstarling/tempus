@@ -15,6 +15,7 @@ export default function Page() {
   const [backgroundGradient, setBackgroundGradient] = useState("")
   const [isLight, setIsLight] = useState(true)
   const [selectedDestination, setSelectedDestination] = useState<DestinationOption | null>(null)
+  const [savedLocationsKey, setSavedLocationsKey] = useState(0)
 
   const loadDestinationOptions = async (inputValue: string, callback: (options: DestinationOption[]) => void) => {
     if (inputValue.length < 2) return callback([]);
@@ -88,11 +89,40 @@ export default function Page() {
     }
   };
 
+  const handleSavedLocationSelect = async (lat: number, lon: number, locationName: string) => {
+    try {
+      const weatherData = await fetchWeatherData(lat, lon, new Date().toISOString());
+      
+      if (weatherData) {
+        setWeatherData(weatherData);
+        setSelectedDestination({ value: `${lat},${lon}`, label: locationName });
+        const gradient = getBackgroundColor(
+          weatherData.current.weather[0].id,
+          weatherData.current.temp,
+          weatherData.current.dt,
+          weatherData.current.sunset,
+          weatherData.current.sunrise
+        );
+        setBackgroundGradient(gradient);
+        setIsLight(isLightGradient(gradient));
+      }
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+    }
+  };
+
+  const handleLocationSaved = () => {
+    setSavedLocationsKey(prev => prev + 1);
+  };
 
   console.log('selectedDestination', selectedDestination);
   return (
     <div className={`flex min-h-screen transition-all duration-500 ${backgroundGradient || 'bg-gradient-to-b from-blue-400 to-blue-600'}`}>
-      <AppSidebar backgroundGradient={backgroundGradient} />
+      <AppSidebar 
+        backgroundGradient={backgroundGradient} 
+        onLocationSelect={handleSavedLocationSelect}
+        onLocationSaved={handleLocationSaved}
+      />
       <main className="flex-1 flex flex-col items-center">
         <div className={`w-full max-w-8xl h-full transition-all duration-500 pt-8 ${
           weatherData 
@@ -128,12 +158,13 @@ export default function Page() {
           </div>
 
           {weatherData && (
-            <div className="w-full mt-2 ransition-opacity duration-500">
+            <div className="w-full mt-2 transition-opacity duration-500">
               <WeatherDisplay 
                 weatherData={weatherData}
                 backgroundGradient={backgroundGradient}
                 isLight={isLight}
-                location={selectedDestination?.label}
+                location={selectedDestination?.label || ''}
+                onLocationSaved={handleLocationSaved}
               />
             </div>
           )}

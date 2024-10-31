@@ -80,6 +80,29 @@ export function useSavedLocations() {
     }
   };
 
+  // Delete a location
+  const deleteLocation = async (locationId: string) => {
+    if (!userId) return;
+
+    try {
+      const token = await getToken();
+      const response = await fetch(`http://localhost:8080/api/locations/${locationId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to delete location');
+
+      // Update local state by removing the deleted location
+      setLocations(prev => prev.filter(loc => loc.id !== locationId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      throw err;
+    }
+  };
+
   // Load locations when user is available
   useEffect(() => {
     if (userId) {
@@ -92,6 +115,7 @@ export function useSavedLocations() {
     isLoading,
     error,
     saveLocation,
+    deleteLocation,
     refreshLocations: fetchLocations
   };
 }

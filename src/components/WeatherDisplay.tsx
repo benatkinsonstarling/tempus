@@ -23,9 +23,10 @@ interface WeatherDisplayProps {
   backgroundGradient: string;
   isLight: boolean;
   location: string;
+  onLocationSaved: () => void;
 }
 
-const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ weatherData, backgroundGradient, isLight, location }) => {
+const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ weatherData, backgroundGradient, isLight, location, onLocationSaved }) => {
   const { isSignedIn } = useUser();
   const { saveLocation, locations } = useSavedLocations();
   const textColor = isLight ? 'text-gray-800' : 'text-gray-200';
@@ -162,6 +163,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ weatherData, background
         isFavorite: false
       });
       toast.success("Location saved successfully!");
+      onLocationSaved();
     } catch (error) {
       toast.error("Failed to save location");
     }
