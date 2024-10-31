@@ -1,14 +1,18 @@
 "use client"
 
-import React, { useState } from "react"
-import { LogIn, User, LogOut } from "lucide-react"
+import React from "react"
+import { LogOut, User, MapPin } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -20,67 +24,85 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs"
+import { SavedLocations } from "./SavedLocations"
 
 interface AppSidebarProps {
   backgroundGradient?: string;
+  onLocationSelect?: (lat: number, lon: number) => void;
 }
 
-export function AppSidebar({ backgroundGradient }: AppSidebarProps) {
-  const [user, setUser] = useState<{ name: string; avatar: string } | null>(null)
+function SidebarContents({ onLocationSelect }: { onLocationSelect?: (lat: number, lon: number) => void }) {
+  const { user, isSignedIn } = useUser()
+  const { state } = useSidebar()
+  const isExpanded = state === "expanded"
 
-  const handleLogin = () => {
-    setUser({ name: "John Doe", avatar: "/path/to/avatar.jpg" })
-  }
+  return (
+    <>
+      <SidebarHeader>
+        <SidebarTrigger />
+      </SidebarHeader>
+      <SidebarContent>
+        {isSignedIn && (
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              <MapPin className="mr-2" />
+              {isExpanded && "Saved Locations"}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SavedLocations onLocationSelect={onLocationSelect || (() => {})} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+      <SidebarFooter>
+        {isSignedIn ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={user?.imageUrl} alt={user?.fullName || ''} />
+                  <AvatarFallback>{user?.firstName?.[0]}</AvatarFallback>
+                </Avatar>
+                {isExpanded && (
+                  <span className="ml-2">{user?.fullName}</span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <SignOutButton>
+                <DropdownMenuItem>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </SignOutButton>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <SignInButton mode="modal">
+            <Button variant="ghost" className="w-full justify-start">
+              <User className="h-4 w-4" />
+              {isExpanded && (
+                <span className="ml-2">Sign in</span>
+              )}
+            </Button>
+          </SignInButton>
+        )}
+      </SidebarFooter>
+    </>
+  )
+}
 
-  const handleRegister = () => {
-    // Implement your registration logic here
-  }
-
-  const handleLogout = () => {
-    setUser(null)
-  }
-
+export function AppSidebar({ backgroundGradient, onLocationSelect }: AppSidebarProps) {
   return (
     <SidebarProvider defaultOpen={false}>
       <Sidebar 
         collapsible="icon"
         className={`${backgroundGradient ? backgroundGradient + ' ' : 'bg-black'} bg-opacity-10 transition-all duration-500`}
       >
-        <SidebarHeader>
-          <SidebarTrigger />
-        </SidebarHeader>
-        <SidebarContent>
-          {/* Empty content section - required for structure */}
-        </SidebarContent>
-        <SidebarFooter>
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start">
-                  <Avatar className="h-6 w-6 mr-2">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <span>{user.name}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Button variant="ghost" className="w-full justify-start" onClick={handleRegister}>
-                <User className="mr-2 h-4 w-4" />
-              </Button>
-            </>
-          )}
-        </SidebarFooter>
+        <SidebarContents onLocationSelect={onLocationSelect} />
       </Sidebar>
     </SidebarProvider>
   )

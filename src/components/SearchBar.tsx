@@ -63,28 +63,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative z-10 w-full">
-      <AsyncSelect<DestinationOption>
-        className={`text-prim placeholder-${isLight ? 'black' : 'white'} placeholder-opacity-70`}
-        value={selectedDestinationOption}
-        onChange={handleDestinationChange}
-        loadOptions={loadDestinationOptions}
-        placeholder="Search for a city..."
-        styles={{
-          ...styles,
-          container: (provided) => ({
-            ...provided,
-            width: '100%',
-          }),
-        }}
-      />
-      <button 
-        type="submit" 
-        className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isLight ? 'text-black' : 'text-white'} hover:text-sky-700 transition-colors`}
-      >
-        <GlobalSearchIcon size={24} />
-      </button>
-    </form>
+    <div className="w-full flex justify-center">
+      <form onSubmit={handleSubmit} className="relative z-10 w-1/3 min-w-[300px]">
+        <AsyncSelect<DestinationOption>
+          className={`text-prim placeholder-${isLight ? 'black' : 'white'} placeholder-opacity-70`}
+          value={selectedDestinationOption}
+          onChange={handleDestinationChange}
+          loadOptions={loadDestinationOptions}
+          placeholder="Search for a city..."
+          styles={{
+            ...styles,
+            container: (provided) => ({
+              ...provided,
+              width: '100%',
+            }),
+          }}
+        />
+        <button 
+          type="submit" 
+          className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isLight ? 'text-black' : 'text-white'} hover:text-sky-700 transition-colors`}
+        >
+          <GlobalSearchIcon size={24} />
+        </button>
+      </form>
+    </div>
   );
 };
 

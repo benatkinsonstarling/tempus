@@ -34,6 +34,8 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar"
 
+import { User } from "@clerk/clerk-react";
+
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
@@ -747,39 +749,49 @@ const SidebarMenuSubButton = React.forwardRef<
 SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
 
 
-export function SidebarAuth({ user, onLogin, onRegister, onLogout }) {
-    if (user) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start">
-              <Avatar className="h-6 w-6 mr-2">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              {user.name}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout}>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
-  
+export function SidebarAuth({ 
+  user, 
+  onLogin, 
+  onRegister, 
+  onLogout 
+}: { 
+  user: User | null;
+  onLogin: () => void;
+  onRegister: () => void;
+  onLogout: () => void;
+}) {
+  if (user) {
     return (
-      <>
-        <Button variant="ghost" className="w-full justify-start" onClick={onLogin}>
-          Log in
-        </Button>
-        <Button variant="ghost" className="w-full justify-start" onClick={onRegister}>
-          Register
-        </Button>
-      </>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="w-full justify-start">
+            <Avatar className="h-6 w-6 mr-2">
+              <AvatarImage src={user.imageUrl} alt={user.fullName || ''} />
+              <AvatarFallback>{user.firstName?.[0]}</AvatarFallback>
+            </Avatar>
+            {user.fullName}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={onLogout}>Log out</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
+
+  return (
+    <>
+      <Button variant="ghost" className="w-full justify-start" onClick={onLogin}>
+        Log in
+      </Button>
+      <Button variant="ghost" className="w-full justify-start" onClick={onRegister}>
+        Register
+      </Button>
+    </>
+  )
+}
   
   
 export {

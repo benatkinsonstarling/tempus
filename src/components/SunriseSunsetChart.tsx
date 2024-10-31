@@ -10,9 +10,8 @@ interface SunriseSunsetProps {
 const SunriseSunsetChart: React.FC<SunriseSunsetProps> = ({ sunrise, sunset, textColor }) => {
   return (
     <div className={`w-full h-full flex flex-col justify-center ${textColor}`}>
-      <h3 className="text-lg font-semibold text-center mb-4">Sunrise & Sunset</h3>
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+      <div className="flex justify-between flex-col items-center">
+        <div className="flex items-center space-x-2 mb-4">
           <div className="p-2 bg-yellow-100 rounded-full">
             <Sunrise className="h-6 w-6 text-yellow-600" />
           </div>

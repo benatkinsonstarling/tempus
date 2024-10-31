@@ -1,3 +1,5 @@
+"use client"
+
 import { useSavedLocations } from "@/hooks/useSavedLocations";
 import { MapPinIcon } from "lucide-react";
 import { Button } from "./ui/button";
