@@ -6,7 +6,7 @@ interface SavedLocationsProps {
 }
 
 export function SavedLocations({ onLocationSelect }: SavedLocationsProps) {
-  const { locations, isLoading, error, deleteLocation } = useSavedLocations();
+  const { locations, isLoading, error, deleteLocation, toggleFavorite } = useSavedLocations();
   
   if (isLoading) {
     return <div className="p-4">Loading saved locations...</div>;
@@ -28,7 +28,7 @@ export function SavedLocations({ onLocationSelect }: SavedLocationsProps) {
   const favoriteLocations = locations.filter(loc => loc.isFavorite);
   const nonFavoriteLocations = locations
     .filter(loc => !loc.isFavorite)
-    .slice(0, 3); // Take only the 3 most recent
+    .slice(0, 5); // Take only the 3 most recent
 
   // Combine favorites and recent non-favorites
   const locationsToDisplay = [...favoriteLocations, ...nonFavoriteLocations];
@@ -45,6 +45,7 @@ export function SavedLocations({ onLocationSelect }: SavedLocationsProps) {
           onClick={() => onLocationSelect(location.latitude, location.longitude, location.name)}
           isFavorite={location.isFavorite}
           onDelete={deleteLocation}
+          onToggleFavorite={toggleFavorite}
         />
       ))}
     </div>

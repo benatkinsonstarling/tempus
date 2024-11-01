@@ -103,6 +103,34 @@ export function useSavedLocations() {
     }
   };
 
+  const toggleFavorite = async (locationId: string) => {
+    if (!userId) return;
+
+    try {
+      const token = await getToken();
+      const response = await fetch(`http://localhost:8080/api/locations/${locationId}/favorite`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to update favorite status');
+
+      const updatedLocation = await response.json();
+      
+      // Update the locations array with the new favorite status
+      setLocations(prev => prev.map(loc => 
+        loc.id === locationId ? updatedLocation : loc
+      ));
+
+      return updatedLocation;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      throw err;
+    }
+  };
+
   // Load locations when user is available
   useEffect(() => {
     if (userId) {
@@ -116,6 +144,7 @@ export function useSavedLocations() {
     error,
     saveLocation,
     deleteLocation,
+    toggleFavorite,
     refreshLocations: fetchLocations
   };
 }

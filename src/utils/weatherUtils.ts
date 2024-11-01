@@ -202,9 +202,12 @@ export const isNighttime = (currentTime: number, sunset: number, sunrise: number
 };
 
 export const isLightGradient = (gradient: string): boolean => {
+  console.log('gradient', gradient);
   if (gradient) {
+    console.log('gradient is not null');
     const lightGradients = [
       'from-blue-300', 'from-blue-200', 'from-yellow-200', 
+      'to-yellow-200', 'to-blue-200', 'to-blue-300',
       'from-gray-200', 'from-gray-300', 'from-gray-100'
     ];
     return lightGradients.some(light => gradient.includes(light));
